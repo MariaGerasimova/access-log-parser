@@ -30,16 +30,32 @@ public class Main {
                     BufferedReader reader = new BufferedReader(fileReader); // сохранение содержимого файла (всего) в буфер для чтения
                     String line;
                     List<Integer> linelst=new ArrayList<>(); // массив для хранения размера строк
+                    LogParser logpars=new LogParser();
                     while ((line = reader.readLine()) != null) { //readLine() - считает построчно(берет целую строку из буфера и возвращает ее как string)
                         int length = line.length();
                         linelst.add(length);
+
                         if (length>1024) {
                             throw new LenghtLineExceed1024Exception("Длина строки превышает 1024 символа");
                         };
+                        //задание 9,2- выдgentеление User-A
+                        String[] parts = line.split("compatible;"); // разделение строки до "(compatible" и после
+                        if (parts.length >= 2) { // если больше 2-х строк, то значит compatible есть в строке и делим ее дальше (берем 2-ую часть посде)
+                            String fragment1 = parts[1];
+                            String[] parts2 = fragment1.split(";");
+                            for (int i=0; i<parts2.length;i++){
+                                parts2[i]=parts2[i].replaceAll(" ","");//убираем пробелы
+                            }
+                            String fragment2=parts2[0]; // фрагмент с Bot
+                            String[] parts3 = fragment2.split("/");
+                            logpars.setUserAgent(parts3[0]); //сохраненяем все найденные userAgent
+                        }
                     }
+                    System.out.println("userAgent: " + logpars.userAgent.size());
+                    System.out.println("Googlebot количество строк:" + logpars.findCountElement("Googlebot") + "     YandexBot  количество строк:" + logpars.findCountElement("YandexBot"));
+                    System.out.println("Доля запросов от Googlebot по отношению к запросам от ботов:" + logpars.findPercentElement("Googlebot"));
+                    System.out.println("Доля запросов от YandexBot по отношению к запросам от ботов:" + logpars.findPercentElement("YandexBot"));
                     System.out.println("Общее количество строк в файле: " + linelst.size());
-                    System.out.println("Длина самой короткой строки в файле: " + minLenght(linelst));
-                    System.out.println("Длина самой длинной строки в файле: " + maxLenght(linelst));
                 }
                 catch (FileNotFoundException e){
                     e.printStackTrace();
