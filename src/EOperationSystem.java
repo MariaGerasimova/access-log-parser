@@ -1,5 +1,6 @@
 import java.awt.*;
 
 public enum EOperationSystem {
-    WINDOWS,MACOS,LINUX
+    WINDOWS,MACINTOSH,LINUX,INCORRECT
+
 }

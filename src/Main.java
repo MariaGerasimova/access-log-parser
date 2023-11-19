@@ -33,18 +33,18 @@ public class Main {
                     while ((line = reader.readLine()) != null) { //readLine() - считает построчно(берет целую строку из буфера и возвращает ее как string)
                         int length = line.length();
                         linelst.add(length);
-
                         if (length>1024) {
                             throw new LenghtLineExceed1024Exception("Длина строки превышает 1024 символа");
                         };
+                        //System.out.println(linelst.size());
                         LogEntry entry=new LogEntry(line);
                         entries.add(entry);
                     }
-                    //System.out.println("userAgent: " + logpars.userAgent.size());
-                    //System.out.println("Googlebot количество строк:" + logpars.findCountElement("Googlebot") + "     YandexBot  количество строк:" + logpars.findCountElement("YandexBot"));
-                    //System.out.println("Доля запросов от Googlebot по отношению к запросам от ботов:" + logpars.findPercentElement("Googlebot"));
-                    //System.out.println("Доля запросов от YandexBot по отношению к запросам от ботов:" + logpars.findPercentElement("YandexBot"));
                     System.out.println("Общее количество строк в файле: " + linelst.size());
+                    //Statistics
+                    Statistics statistics=new Statistics();
+                    statistics.addEntry(entries);
+                    System.out.println("Общий траффик за час" + statistics.getTrafficRate());
                 }
                 catch (FileNotFoundException e){
                     e.printStackTrace();

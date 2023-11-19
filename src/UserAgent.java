@@ -1,48 +1,66 @@
-import java.util.Objects;
-
 public class UserAgent {
-    final String bot; // can be absent ""
-    //final EOperationSystem OS;
-    //final String brouser; //? enum or not?
+
+    final EOperationSystem os;
+    final String brouser; //
 
 
-    public UserAgent(String userAgent){
-        if (userAgent==""){
-            this.bot=null;
-            //this.OS=null;
-            //this.brouser=null;
+    public UserAgent(String userAgent) {
+        if (userAgent == "") {
+
+            this.os = null;
+            this.brouser = null;
+            return;
         }
-        else {
-            String[] parts2 = userAgent.split(";");
-            // agent
-            for (int i = 0; i < parts2.length; i++) {
-                parts2[i] = parts2[i].replaceAll(" ", "");//убираем пробелы
-            }
+        //OS
+        String[] parts1 = userAgent.split(";");
+        String[] parts1a = parts1[0].split(" ");//OS can be like "Macintosh;" "Windows NT 10.0" or without
+        if (parts1a[0].toUpperCase().equals("IPHONE")||parts1a[0].toUpperCase().equals("IPAD")||parts1a[0].toUpperCase().equals("FEEDER.CO")) parts1a[0]="MACINTOSH";
+        if (parts1a[0].toUpperCase().equals("X11")||parts1a[0].toUpperCase().equals("X11)")) parts1a[0]="LINUX";
+        EOperationSystem a=null;
+        try {
+             a= EOperationSystem.valueOf(parts1a[0].toUpperCase());
+        }
+        catch (IllegalArgumentException ex){
+            //System.out.println("Что то не то пришло. в переменной: " + parts1a[0].toUpperCase() /*+ "Ошибка:" + ex*/);
+        }
+        if (a!=null) this.os=a; //v botax bivaet bez OS
+        else this.os=null;
+        //brouser
+        //отобрать ботов
+        String[] parts2 = userAgent.split("compatible;");
+        for (int i = 0; i < parts2.length; i++) {
+            parts2[i] = parts2[i].replaceAll(" ", "");//убираем пробелы
+        }
+        if (parts2.length >= 2) { // если больше 2-х строк, то значит compatible есть в строке и это боты. делим ее дальше (берем 2-ую часть после)
             String fragment2 = parts2[0]; // фрагмент с Bot
             String[] parts3 = fragment2.split("/");
-            this.bot = parts3[0]; //сохраненяем все найденные userAgent
+            this.brouser = parts3[0]; //сохраненяем все найденные userAgent
+        } else {
+            //определяем тип браузера
+            String[] parts3 = userAgent.split(" ");
+            int i = parts3.length-1;
+            String[] parts3a =parts3[i].split("/");
+            String element=parts3a[0];
+            switch (element) {
+                case "Firefox":this.brouser="Firefox";break;
+                case "Safari": {
+                        if (userAgent.contains("KHTML, like Gecko")) this.brouser = "Chrome";
+                        else this.brouser="Safari";
+                        break;
+                        }
+                case "OPR":this.brouser="Opera";break;
+                case "Edge": this.brouser="Edge";break;
+                default:this.brouser="Other";break;
+            }
         }
+    }
+    //Getters
 
+    public EOperationSystem getOs() {
+        return os;
     }
 
-    //getters
-    public String getBot() {
-        return bot;
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        UserAgent logParser = (UserAgent) o;
-        return Objects.equals(bot, logParser.bot);
-    }
-    @Override
-    public int hashCode() {
-        return Objects.hash(bot);
-    }
-    @Override
-    public String toString() {
-        return "userAgent=" + bot;
+    public String getBrouser() {
+        return brouser;
     }
 }
