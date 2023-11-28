@@ -28,8 +28,7 @@ public class Main {
                     BufferedReader reader = new BufferedReader(fileReader); // сохранение содержимого файла (всего) в буфер для чтения
                     String line;
                     List<Integer> linelst=new ArrayList<>(); // массив для хранения размера строк
-                    //UserAgent logpars=new UserAgent();
-                    List <LogEntry> entries=new ArrayList<>(); // для хранения строк
+                    Statistics statistics=new Statistics(); //Statistics
                     while ((line = reader.readLine()) != null) { //readLine() - считает построчно(берет целую строку из буфера и возвращает ее как string)
                         int length = line.length();
                         linelst.add(length);
@@ -38,12 +37,9 @@ public class Main {
                         };
                         //System.out.println(linelst.size());
                         LogEntry entry=new LogEntry(line);
-                        entries.add(entry);
+                        statistics.addEntry(entry);
                     }
                     System.out.println("Общее количество строк в файле: " + linelst.size());
-                    //Statistics
-                    Statistics statistics=new Statistics();
-                    statistics.addEntry(entries);
                     System.out.println("Общий траффик за час" + statistics.getTrafficRate());
                 }
                 catch (FileNotFoundException e){

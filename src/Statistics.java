@@ -14,19 +14,21 @@ public class Statistics {
         this.minTime=null;
         this.maxTime=null;
     }
-
     // метод addEntry, принимающий в качестве параметра объект класса LogEntry
-    public void addEntry(List<LogEntry> logEntry){
+    public void addEntry(LogEntry logEntry){
+        //minTime maxTime
+        if (minTime==null || maxTime==null) {
+            minTime = logEntry.getDateTime();
+            maxTime = logEntry.getDateTime();
+        }
+        else {
+            if (minTime.compareTo(logEntry.dateTime)>0) minTime=logEntry.dateTime;
+            if (maxTime.compareTo(logEntry.dateTime)<0) maxTime=logEntry.dateTime;
+        }
         // traffic
-        minTime=logEntry.get(0).getDateTime();
-        maxTime=logEntry.get(0).getDateTime();
-        for (int i=0;i<logEntry.size();i++){
-            totalTraffic+=logEntry.get(i).getResponseSize();
+        totalTraffic+=logEntry.getResponseSize();
             /*if (totalTraffic>2147483647 || totalTraffic<0) {
                 System.out.println("Превышение инт: i=" +i + "Трафик" + totalTraffic);}*/
-            if (i>0 && minTime.compareTo(logEntry.get(i).dateTime)>0) minTime=logEntry.get(i).dateTime;
-            if (i>0 && maxTime.compareTo(logEntry.get(i).dateTime)<0) maxTime=logEntry.get(i).dateTime;
-        }
     }
 
     //метод getTrafficRate, в котором вычисляйте разницу между maxTime и minTime в часах и делите общий объём трафика на эту разницу
