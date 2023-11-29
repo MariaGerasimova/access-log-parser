@@ -41,8 +41,10 @@ public class Main {
                     }
                     System.out.println("Общее количество строк в файле: " + linelst.size());
                     System.out.println("Общий траффик за час" + statistics.getTrafficRate());
-                    System.out.println("Просмотренные страницы сайта" + statistics.getPathsHasSet());
+                    System.out.println("Просмотренные страницы сайта с кодом 200" + statistics.getPathsSuccess());
+                    System.out.println("Несуществующие страницы сайта с кодом 406" + statistics.getPathsFailed());
                     System.out.println("ОС и их рейт" + statistics.getOSRate());
+                    System.out.println("браузеры и их рейт" + statistics.getbrouserRate());
                 }
                 catch (FileNotFoundException e){
                     e.printStackTrace();

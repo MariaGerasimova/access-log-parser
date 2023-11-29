@@ -34,7 +34,8 @@ public class UserAgent {
         if (parts2.length >= 2) { // если больше 2-х строк, то значит compatible есть в строке и это боты. делим ее дальше (берем 2-ую часть после)
             String fragment2 = parts2[0]; // фрагмент с Bot
             String[] parts3 = fragment2.split("/");
-            this.brouser = parts3[0]; //сохраненяем все найденные userAgent
+            //this.brouser = parts3[0]; //сохраненяем все найденные userAgent
+            this.brouser = "Bot";
         } else {
             //определяем тип браузера
             String[] parts3 = userAgent.split(" ");
