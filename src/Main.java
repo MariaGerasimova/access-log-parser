@@ -41,6 +41,8 @@ public class Main {
                     }
                     System.out.println("Общее количество строк в файле: " + linelst.size());
                     System.out.println("Общий траффик за час" + statistics.getTrafficRate());
+                    System.out.println("Просмотренные страницы сайта" + statistics.getPathsHasSet());
+                    System.out.println("ОС и их рейт" + statistics.getOSRate());
                 }
                 catch (FileNotFoundException e){
                     e.printStackTrace();
