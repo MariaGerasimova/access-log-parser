@@ -11,8 +11,8 @@ public class Main {
 
          //запрашиваем путь к файлу
         int fileCount=0;
-        String path; // вынесла инициализацию переменной (13.11)
         while (true) {
+        String path; // вынесла инициализацию переменной (13.11)
             System.out.println("Введите путь к файлу и нажмите <Enter>: ");
             path = new Scanner(System.in).nextLine();
             File file = new File(path);
@@ -48,6 +48,9 @@ public class Main {
                     System.out.println("ОС и их рейт" + statistics.getOSRate());
                     System.out.println("браузеры и их рейт" + statistics.getbrouserRate());
                     System.out.println("Средняя посещаемость одним пользователем ( в час): " + statistics.getTrafficUserPerHour());
+                    System.out.println("максимальное посещение сайта в какую то секунду: " + statistics.getMaxRequestInSec());
+                    System.out.println("Домены referer: " + statistics.getRefererDomainSet());
+                    System.out.println("Максимальная посещаемость среди юзеров(ip adress):  " + statistics.getMaxVisitPerUsers());
                 }
                 catch (FileNotFoundException e){
                     e.printStackTrace();
