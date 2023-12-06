@@ -11,7 +11,7 @@ public class LogEntry { // объект - это строка из файла
     final String path;
     final int responseCode;
     final Integer responseSize;
-    final String referer; // путь на страницу
+    final String referer; // путь на страницу c которой перешли на текущую
     final UserAgent userAgent;
 
     public LogEntry(String line){

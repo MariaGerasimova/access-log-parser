@@ -14,6 +14,10 @@ public class Statistics {
    protected HashSet <String> pathsFailed; // address pages with code=404
    protected HashMap<String, Integer> osHashMap; // os, count_OS
    protected HashMap<String, Integer> brouserHashMap; // brouser, count_brouser
+   protected HashMap<String, Integer> ipAdressCountRequestHashMap; // ipaddress, count_request
+   protected Integer countVisitUserNotBot; // Bot
+   protected Integer countFailedRequests; // address pages with code=4XX or code=5XX
+
 
     public Statistics (){
         this.totalTraffic=0;
@@ -23,6 +27,9 @@ public class Statistics {
         this.pathsFailed=new HashSet<>();
         this.osHashMap=new HashMap<>();
         this.brouserHashMap=new HashMap<>();
+        this.countVisitUserNotBot=0;
+        this.ipAdressCountRequestHashMap =new HashMap<>();
+        this.countFailedRequests=0;
     }
 
     public HashSet<String> getPathsSuccess() {
@@ -58,13 +65,14 @@ public class Statistics {
         } else if (logEntry.responseCode==404 && logEntry.path!="") {
             pathsFailed.add(logEntry.getPath());
         }
+        //countFailedRequests
+        if (logEntry.path!="" && (logEntry.responseCode>399 && logEntry.responseCode<600)){
+            countFailedRequests+=1;
+        }
+
         //OS
         if (logEntry.userAgent.os!=null) {
             String os = logEntry.userAgent.getOs().name();
-            if (osHashMap.isEmpty()){
-                osHashMap.put(logEntry.userAgent.getOs().toString(), 1);
-                //return;
-            }
             if (osHashMap.containsKey(logEntry.userAgent.getOs().name())) {
                 int count = osHashMap.get(logEntry.userAgent.getOs().name());
                 count++;
@@ -73,13 +81,10 @@ public class Statistics {
                 osHashMap.put(logEntry.userAgent.getOs().toString(), 1);
             }
         }
-        //brouser
-        if (logEntry.userAgent.brouser!=null) {
+        //brouser and countVisitUserNotBot
+        if (logEntry.userAgent.brouser!=null && logEntry.userAgent.isBot==false) { //brouser!=null and NotBot
+            this.countVisitUserNotBot+=1;
             String brouser = logEntry.userAgent.getBrouser();
-            if (brouserHashMap.isEmpty()){
-                brouserHashMap.put(logEntry.userAgent.getBrouser(), 1);
-                return;
-            }
             if (brouserHashMap.containsKey(logEntry.userAgent.getBrouser())) {
                 int count = brouserHashMap.get(logEntry.userAgent.getBrouser());
                 count++;
@@ -87,16 +92,31 @@ public class Statistics {
             } else {
                 brouserHashMap.put(logEntry.userAgent.getBrouser(), 1);
             }
+          //  ipAdressCountRequest (not Bot)
+          if (logEntry.userAgent.isBot==false)  {
+              if (ipAdressCountRequestHashMap.containsKey(logEntry.getIpAddr())) {
+                  int count = ipAdressCountRequestHashMap.get(logEntry.getIpAddr());
+                  count++;
+                  ipAdressCountRequestHashMap.put(logEntry.getIpAddr(), count);
+              } else {
+                  ipAdressCountRequestHashMap.put(logEntry.getIpAddr(), 1);
+              }
+          }
+
         }
 
+    }
+    //вычисляется период записи лога (между maxTime и minTime в часах)
+    public long durationHoursLog(){
+        DateTimeFormatter format=DateTimeFormatter.ofPattern("dd/MMM/yyyy:HH:mm:ss");
+        Duration duration=Duration.between(minTime,maxTime);
+        return duration.toHours();
     }
 
     //метод getTrafficRate, в котором вычисляется разница между maxTime и minTime в часах и делите общий объём трафика на эту разницу
     public long getTrafficRate () {
-        DateTimeFormatter format=DateTimeFormatter.ofPattern("dd/MMM/yyyy:HH:mm:ss");
-        Duration duration=Duration.between(minTime,maxTime);
-        long hours=duration.toHours();
-        return totalTraffic/hours;
+        return totalTraffic/ durationHoursLog();
+
     }
     // метод рассчитывает долю для каждой операционной системы (от 0 до 1) (=количество конкретной операционной системы/общее количество для всех операционных систем)
     public HashMap<String, Double> getOSRate (){
@@ -116,16 +136,33 @@ public class Statistics {
     // метод рассчитывает долю для каждого браузера (от 0 до 1) (=количество конкретного браузера/общее количество для всех боаузеров)
     public HashMap<String, Double> getbrouserRate (){
         HashMap<String, Double> brouserRate=new HashMap<>();
-        double sum=0;
+        double countBrousers=0;
         for (Map.Entry entry: brouserHashMap.entrySet()){
             int i=(int)entry.getValue();
-            sum+=i;
+            countBrousers+=i; // sum of all brousers
         }
         for (Map.Entry entry: brouserHashMap.entrySet()){
             int i=(int)entry.getValue();
-            Double rate=i/sum;
+            Double rate=i/countBrousers;
             brouserRate.put(entry.getKey().toString(),rate);
         }
         return brouserRate;
+    }
+    // метод расчета среднего посещения сайта за час (не боты)
+    public long getTrafficVisitUser (){
+        return countVisitUserNotBot/ durationHoursLog();
+    }
+    //метод расчета количества ошибочных запросов в час
+    public long getTrafficFailedRequest (){
+        return countFailedRequests/ durationHoursLog();
+    }
+    //метод расчета средней посещаемости одним пользователем(=ip adress) (sum count Requests/count ip-address)
+    public long getTrafficUserPerHour () {
+        int sumRequests=0;
+        for (Map.Entry entry: ipAdressCountRequestHashMap.entrySet()){
+            int i=(int)entry.getValue();
+            sumRequests+=i; // sum of all brousers
+        }
+        return sumRequests/ipAdressCountRequestHashMap.size();
     }
 }
